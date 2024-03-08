@@ -1,0 +1,51 @@
+JP 0800h
+ORG 0800h 
+
+;===== FIB NUMBER GENERATOR
+
+INPORT EQU 00h ; NUMBER 
+OUTPORT EQU 00h
+
+
+START: 	IN A, (INPORT)
+	LD HL, 0xFFD0 	    ; WE INIT MEMORY POS
+	CP 0  	          ; WE CHECK IF INPUT IS 0	
+	JP Z, RETURNZERO	; IF SO WE RETURN
+	
+	DEC A		; WE ANTICIPATE THIS FIRST TWO ITERATIONS
+	DEC A 
+	LD E, A	; WE LOAD OUR NUMBER INTO E. E WILL NOW KEEP TRACK OF ITERATIONS.
+
+	LD A, 0
+	OUT (OUTPORT), A 	; FIB(0)= 0
+	LD (HL), A	; WE WRITE INTO MEMORY
+	INC HL 	; WE MOVE FORWARD IN MEMORY 
+	INC A		; 
+ 	OUT (OUTPORT), A 	; FIB(1)= 1
+	LD (HL), A 
+	INC HL
+	
+	LD B,0  ;TERM ZERO SAVED IN B
+	LD C,1  ;FIRST TERM SAVED IN C
+		
+
+FIB: 	LD A, E
+	CP 0 ; 
+	JP Z, FINISH; if we reached iterations then we will return
+	DEC A; We decrease iteration counter
+	LD E, A; We put counter in E
+	LD A, B
+	ADD A, C
+	LD (HL), A
+	INC HL
+	OUT (OUTPORT), A; we output the number
+	LD B, C; we move the numbers
+	LD C, A; we move the numbers
+	JP FIB
+	                
+
+RETURNZERO: LD (HL), A
+	OUT (OUTPORT), A
+	JP FINISH
+	
+FINISH: HALT ; for now
